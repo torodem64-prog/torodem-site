@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>torodem@terminal:~/chat$</title>
+    <style>
+        @keyframes flicker {
+            0% { opacity: 0.97; } 5% { opacity: 0.95; } 10% { opacity: 0.97; }
+            15% { opacity: 0.93; } 20% { opacity: 0.97; } 25% { opacity: 0.95; }
+            30% { opacity: 0.97; } 35% { opacity: 0.96; } 40% { opacity: 0.97; }
+            45% { opacity: 0.95; } 50% { opacity: 0.97; } 55% { opacity: 0.93; }
+            60% { opacity: 0.97; } 65% { opacity: 0.96; } 70% { opacity: 0.97; }
+            75% { opacity: 0.95; } 80% { opacity: 0.97; } 85% { opacity: 0.93; }
+            90% { opacity: 0.97; } 95% { opacity: 0.95; } 100% { opacity: 0.97; }
+        }
+        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 4px #7c3aed; } 50% { box-shadow: 0 0 12px #a78bfa; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0e27;
+            background-image:
+                linear-gradient(45deg, #1a1f3a 25%, transparent 25%),
+                linear-gradient(-45deg, #1a1f3a 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #1a1f3a 75%),
+                linear-gradient(-45deg, transparent 75%, #1a1f3a 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            font-family: 'Courier New', monospace;
+            color: #a8b5d1;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* TOP BAR */
+        .topbar {
+            background: #0d1117; border-bottom: 2px solid #30363d;
+            padding: 10px 20px; display: flex; align-items: center; gap: 20px;
+            flex-shrink: 0; position: relative; animation: flicker 4s infinite; z-index: 10;
+        }
+        .topbar::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 2;
+        }
+        .topbar > * { position: relative; z-index: 3; }
+        .topbar-title { color: #a78bfa; font-size: 1.1em; font-weight: bold; }
+        .topbar-prompt { color: #7c3aed; }
+        .topbar-nav { margin-left: auto; display: flex; gap: 15px; align-items: center; }
+        .topbar-nav a { color: #60a5fa; text-decoration: none; font-size: 0.9em; }
+        .topbar-nav a:hover { color: #a78bfa; text-decoration: underline; }
+        .cursor { display: inline-block; width: 8px; height: 14px; background: #a78bfa; animation: blink 1s infinite; vertical-align: middle; margin-left: 2px; }
+        .logout-btn {
+            background: transparent; border: 1px solid #30363d; color: #6b7280;
+            font-family: 'Courier New', monospace; font-size: 0.75em; padding: 4px 10px;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .logout-btn:hover { border-color: #f87171; color: #f87171; }
+
+        /* MAIN LAYOUT */
+        .app { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+        /* AUTH SCREEN */
+        #authScreen {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: #0a0e27; z-index: 100;
+        }
+        .auth-box {
+            background: #0d1117; border: 2px solid #30363d; padding: 40px; width: 440px;
+            animation: flicker 4s infinite; position: relative;
+        }
+        .auth-box::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 0;
+        }
+        .auth-box > * { position: relative; z-index: 1; }
+        .auth-title { color: #a78bfa; font-size: 1.5em; margin-bottom: 4px; }
+        .auth-subtitle { color: #6b7280; font-size: 0.8em; margin-bottom: 26px; }
+        .auth-tabs { display: flex; margin-bottom: 22px; border-bottom: 1px solid #30363d; }
+        .auth-tab {
+            flex: 1; background: transparent; border: none; border-bottom: 2px solid transparent;
+            color: #6b7280; font-family: 'Courier New', monospace; font-size: 0.9em;
+            padding: 8px; cursor: pointer; margin-bottom: -1px; transition: all 0.15s;
+        }
+        .auth-tab.active { color: #a78bfa; border-bottom-color: #7c3aed; }
+        .auth-tab:hover { color: #a8b5d1; }
+        .auth-label { color: #7c3aed; font-size: 0.85em; margin-bottom: 6px; display: block; }
+        .auth-input {
+            width: 100%; background: #161b22; border: 1px solid #30363d; color: #a8b5d1;
+            font-family: 'Courier New', monospace; font-size: 0.95em;
+            padding: 10px 14px; outline: none; margin-bottom: 16px; transition: border-color 0.2s;
+        }
+        .auth-input:focus { border-color: #7c3aed; }
+        .auth-btn {
+            width: 100%; background: #7c3aed; border: none; color: #fff;
+            font-family: 'Courier New', monospace; font-size: 1em; padding: 10px;
+            cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .auth-btn:hover { background: #a78bfa; }
+        .auth-btn:disabled { background: #4a2a8a; cursor: not-allowed; }
+        .auth-error { color: #f87171; font-size: 0.82em; margin-top: 10px; min-height: 18px; }
+        .spinner {
+            width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.6s linear infinite; display: none;
+        }
+        /* password strength */
+        .strength-bar { height: 3px; background: #30363d; margin-bottom: 16px; margin-top: -12px; }
+        .strength-fill { height: 100%; width: 0%; transition: width 0.3s, background 0.3s; }
+        /* security info */
+        .sec-badge {
+            background: #161b22; border: 1px solid #30363d; padding: 10px 12px;
+            font-size: 0.75em; color: #6b7280; margin-top: 16px; line-height: 1.7;
+        }
+        .sec-badge .ok { color: #4ade80; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px; background: #0d1117; border-right: 2px solid #30363d;
+            display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+        }
+        .sidebar-section { padding: 12px 16px 6px; }
+        .sidebar-label { color: #6b7280; font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; }
+        .server-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+        .server-item {
+            padding: 8px 10px; cursor: pointer; color: #8b92a8; font-size: 0.9em;
+            border: 1px solid transparent; transition: all 0.15s; margin-bottom: 2px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .server-item:hover { background: #161b22; border-color: #30363d; color: #a8b5d1; }
+        .server-item.active { background: #161b22; border-color: #7c3aed; color: #a78bfa; }
+        .server-icon { color: #7c3aed; font-size: 0.8em; flex-shrink: 0; }
+        .server-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        .sidebar-actions { padding: 10px 8px; border-top: 1px solid #30363d; display: flex; flex-direction: column; gap: 6px; }
+        .sidebar-btn {
+            background: #161b22; border: 1px solid #30363d; color: #60a5fa;
+            font-family: 'Courier New', monospace; font-size: 0.8em; padding: 7px 10px;
+            cursor: pointer; text-align: left; transition: all 0.15s;
+        }
+        .sidebar-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+        .user-info {
+            padding: 10px 16px; border-top: 2px solid #30363d; background: #161b22;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .user-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; flex-shrink: 0; animation: pulse 2s infinite; }
+        .user-name-display { color: #a78bfa; font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        .dm-section { padding: 12px 16px 6px; margin-top: 10px; border-top: 1px solid #30363d; }
+
+        /* CHAT AREA */
+        .chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header {
+            background: #0d1117; border-bottom: 1px solid #30363d;
+            padding: 12px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+        }
+        .chat-header-name { color: #a78bfa; font-size: 1em; }
+        .chat-header-meta { color: #6b7280; font-size: 0.8em; margin-left: auto; }
+        .header-btn {
+            background: #161b22; border: 1px solid #30363d; color: #60a5fa;
+            font-family: 'Courier New', monospace; font-size: 0.75em; padding: 5px 10px;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .header-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+        .messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
+        .messages::-webkit-scrollbar { width: 4px; }
+        .messages::-webkit-scrollbar-thumb { background: #30363d; }
+        .msg { animation: fadeIn 0.2s ease; padding: 2px 0; }
+        .msg-line { display: flex; gap: 10px; align-items: baseline; }
+        .msg-time { color: #6b7280; font-size: 0.75em; flex-shrink: 0; }
+        .msg-author { font-size: 0.85em; flex-shrink: 0; min-width: 80px; }
+        .msg-author.self { font-weight: bold; }
+        .msg-author.system-author { color: #7c3aed; }
+        .msg-text { color: #a8b5d1; font-size: 0.9em; word-break: break-word; }
+        .msg-text.system-text { color: #6b7280; font-style: italic; }
+        .typing-indicator { color: #6b7280; font-size: 0.8em; padding: 4px 20px; flex-shrink: 0; min-height: 24px; }
+        .input-area {
+            padding: 12px 20px; border-top: 1px solid #30363d; background: #0d1117;
+            display: flex; gap: 10px; flex-shrink: 0;
+        }
+        .input-prompt { color: #7c3aed; padding-top: 10px; flex-shrink: 0; font-size: 0.9em; }
+        .msg-input {
+            flex: 1; background: #161b22; border: 1px solid #30363d; color: #a8b5d1;
+            font-family: 'Courier New', monospace; font-size: 0.9em; padding: 9px 14px;
+            outline: none; resize: none; height: 40px; transition: border-color 0.2s;
+        }
+        .msg-input:focus { border-color: #7c3aed; }
+        .send-btn {
+            background: #7c3aed; border: none; color: #fff;
+            font-family: 'Courier New', monospace; font-size: 0.85em;
+            padding: 9px 18px; cursor: pointer; transition: background 0.15s; flex-shrink: 0;
+        }
+        .send-btn:hover { background: #a78bfa; }
+
+        /* EMPTY STATE */
+        .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6b7280; gap: 12px; }
+        .empty-ascii { color: #30363d; font-size: 0.75em; line-height: 1.3; text-align: center; }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #0d1117; border: 2px solid #30363d; padding: 30px; width: 460px;
+            position: relative; animation: flicker 4s infinite;
+        }
+        .modal::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 0;
+        }
+        .modal > * { position: relative; z-index: 1; }
+        .modal-title { color: #a78bfa; font-size: 1.1em; margin-bottom: 20px; }
+        .modal-label { color: #7c3aed; font-size: 0.85em; margin-bottom: 6px; display: block; }
+        .modal-input {
+            width: 100%; background: #161b22; border: 1px solid #30363d; color: #a8b5d1;
+            font-family: 'Courier New', monospace; font-size: 0.9em; padding: 9px 12px;
+            outline: none; margin-bottom: 16px; transition: border-color 0.2s;
+        }
+        .modal-input:focus { border-color: #7c3aed; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 4px; }
+        .modal-btn {
+            flex: 1; background: #7c3aed; border: none; color: #fff;
+            font-family: 'Courier New', monospace; font-size: 0.9em;
+            padding: 9px; cursor: pointer; transition: background 0.15s;
+        }
+        .modal-btn:hover { background: #a78bfa; }
+        .modal-btn.secondary { background: #161b22; border: 1px solid #30363d; color: #a8b5d1; }
+        .modal-btn.secondary:hover { border-color: #7c3aed; color: #a78bfa; background: #161b22; }
+        .modal-error { color: #f87171; font-size: 0.82em; margin-bottom: 10px; display: none; }
+        .modal-note { color: #6b7280; font-size: 0.8em; margin-bottom: 10px; }
+        .invite-link-box {
+            background: #161b22; border: 1px solid #30363d;
+            padding: 10px 14px; margin: 10px 0; display: flex; align-items: center; gap: 10px;
+        }
+        .invite-link-text { color: #60a5fa; font-size: 0.85em; flex: 1; word-break: break-all; }
+        .copy-btn {
+            background: transparent; border: 1px solid #30363d; color: #a8b5d1;
+            font-family: 'Courier New', monospace; font-size: 0.75em; padding: 4px 8px;
+            cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+        }
+        .copy-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+
+        /* JOIN BANNER */
+        #joinBanner {
+            background: #161b22; border-bottom: 2px solid #7c3aed;
+            padding: 10px 20px; display: none; align-items: center; gap: 12px; flex-shrink: 0;
+        }
+        #joinBanner.show { display: flex; }
+        .join-text { color: #a8b5d1; font-size: 0.85em; flex: 1; }
+        .join-text span { color: #a78bfa; }
+        .join-accept { background: #7c3aed; border: none; color: #fff; font-family: 'Courier New', monospace; font-size: 0.8em; padding: 6px 14px; cursor: pointer; }
+        .join-accept:hover { background: #a78bfa; }
+        .join-dismiss { background: transparent; border: 1px solid #30363d; color: #6b7280; font-family: 'Courier New', monospace; font-size: 0.8em; padding: 6px 10px; cursor: pointer; }
+        .join-dismiss:hover { border-color: #7c3aed; color: #a78bfa; }
+
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #30363d; }
+    </style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+    <div class="auth-box">
+        <div class="auth-title">torodem chat</div>
+        <div class="auth-subtitle">$ accounts secured with PBKDF2-SHA256 + random salt</div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">[ login ]</button>
+            <button class="auth-tab" onclick="switchTab('register')">[ register ]</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="tabLogin">
+            <label class="auth-label">$ username:</label>
+            <input type="text" class="auth-input" id="loginUsername" placeholder="your_name" maxlength="24" autocomplete="username">
+            <label class="auth-label">$ password:</label>
+            <input type="password" class="auth-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            <button class="auth-btn" id="loginBtn" onclick="doLogin()">
+                <span id="loginBtnText">[ connect ]</span>
+                <div class="spinner" id="loginSpinner"></div>
+            </button>
+            <div class="auth-error" id="loginError"></div>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="tabRegister" style="display:none;">
+            <label class="auth-label">$ username:</label>
+            <input type="text" class="auth-input" id="regUsername" placeholder="letters, numbers, _ -" maxlength="24" autocomplete="username">
+            <label class="auth-label">$ password:</label>
+            <input type="password" class="auth-input" id="regPassword" placeholder="min 6 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <label class="auth-label">$ confirm password:</label>
+            <input type="password" class="auth-input" id="regPassword2" placeholder="••••••••" autocomplete="new-password">
+            <label class="auth-label">$ display color:</label>
+            <select class="auth-input" id="regColor" style="cursor:pointer; background:#161b22;">
+                <option value="#60a5fa">blue</option>
+                <option value="#a78bfa">purple</option>
+                <option value="#4ade80">green</option>
+                <option value="#f472b6">pink</option>
+                <option value="#fb923c">orange</option>
+                <option value="#facc15">yellow</option>
+                <option value="#f87171">red</option>
+            </select>
+            <button class="auth-btn" id="regBtn" onclick="doRegister()">
+                <span id="regBtnText">[ create account ]</span>
+                <div class="spinner" id="regSpinner"></div>
+            </button>
+            <div class="auth-error" id="regError"></div>
+            <div class="sec-badge">
+                <span class="ok">✓</span> PBKDF2-SHA256, 310,000 iterations (OWASP 2023 minimum)<br>
+                <span class="ok">✓</span> unique random 16-byte salt per account<br>
+                <span class="ok">✓</span> your actual password is never stored anywhere<br>
+                <span class="ok">✓</span> uses browser's native Web Crypto API — no external libraries
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <span class="topbar-prompt">torodem@system:~/chat$</span>
+    <span class="topbar-title">chat<span class="cursor"></span></span>
+    <div class="topbar-nav">
+        <a href="index.html">home</a>
+        <a href="gallery.html">gallery</a>
+        <a href="contact.html">contact</a>
+        <button class="logout-btn" onclick="doLogout()" id="logoutBtn" style="display:none;">[ logout ]</button>
+    </div>
+</div>
+
+<!-- JOIN INVITE BANNER -->
+<div id="joinBanner">
+    <span class="join-text">$ incoming invite: join server <span id="joinServerName"></span>?</span>
+    <button class="join-accept" onclick="acceptInvite()">[ accept ]</button>
+    <button class="join-dismiss" onclick="dismissInvite()">[ dismiss ]</button>
+</div>
+
+<!-- MAIN APP -->
+<div class="app">
+    <div class="sidebar">
+        <div class="sidebar-section"><div class="sidebar-label">$ servers</div></div>
+        <div class="server-list" id="serverList"></div>
+        <div class="sidebar-section dm-section"><div class="sidebar-label">$ direct messages</div></div>
+        <div class="server-list" id="dmList"></div>
+        <div class="sidebar-actions">
+            <button class="sidebar-btn" onclick="openCreateServer()">[ + ] new server</button>
+            <button class="sidebar-btn" onclick="openJoinModal()">[ → ] join via invite</button>
+            <button class="sidebar-btn" onclick="openDMModal()">[ @ ] new direct message</button>
+        </div>
+        <div class="user-info">
+            <div class="user-dot"></div>
+            <div class="user-name-display" id="sidebarUsername">---</div>
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div class="empty-state" id="emptyState">
+            <div class="empty-ascii">
+ ___________________________<br>
+|  select a server or DM   |<br>
+|  to start chatting..     |<br>
+|__________________________|
+            </div>
+            <div style="font-size:.85em;">$ use the sidebar to navigate</div>
+        </div>
+        <div id="activeChat" style="display:none; flex-direction:column; overflow:hidden; flex:1;">
+            <div class="chat-header">
+                <span style="color:#7c3aed;">#</span>
+                <span class="chat-header-name" id="chatHeaderName"></span>
+                <span class="chat-header-meta" id="chatHeaderMeta"></span>
+                <button class="header-btn" id="inviteBtn" onclick="openInviteModal()" style="display:none;">[ invite ]</button>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="typing-indicator" id="typingIndicator"></div>
+            <div class="input-area">
+                <span class="input-prompt">$</span>
+                <textarea class="msg-input" id="msgInput" placeholder="type a message..." rows="1"></textarea>
+                <button class="send-btn" onclick="sendMessage()">[ send ]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="createServerModal">
+    <div class="modal">
+        <div class="modal-title">$ mkdir new_server</div>
+        <label class="modal-label">server name:</label>
+        <input type="text" class="modal-input" id="newServerName" placeholder="my_server" maxlength="32" autocomplete="off">
+        <label class="modal-label">description (optional):</label>
+        <input type="text" class="modal-input" id="newServerDesc" placeholder="a place for stuff" maxlength="80" autocomplete="off">
+        <div class="modal-btns">
+            <button class="modal-btn secondary" onclick="closeModal('createServerModal')">[ cancel ]</button>
+            <button class="modal-btn" onclick="createServer()">[ create ]</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="inviteModal">
+    <div class="modal">
+        <div class="modal-title">$ generate invite link</div>
+        <div class="modal-note">invite link for: <span id="inviteServerNameDisplay" style="color:#a78bfa;"></span></div>
+        <div class="invite-link-box">
+            <span class="invite-link-text" id="inviteLinkText"></span>
+            <button class="copy-btn" onclick="copyInvite()">[ copy ]</button>
+        </div>
+        <div style="color:#4ade80;font-size:.8em;display:none;margin-top:4px;" id="copyConfirm">✓ copied</div>
+        <div class="modal-btns" style="margin-top:20px;">
+            <button class="modal-btn" onclick="closeModal('inviteModal')">[ close ]</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="joinModal">
+    <div class="modal">
+        <div class="modal-title">$ join --invite-code</div>
+        <label class="modal-label">paste invite link or code:</label>
+        <input type="text" class="modal-input" id="joinCodeInput" placeholder="https://torodem.com/chat?invite=..." autocomplete="off">
+        <div class="modal-error" id="joinError">error: invalid invite code</div>
+        <div class="modal-btns">
+            <button class="modal-btn secondary" onclick="closeModal('joinModal')">[ cancel ]</button>
+            <button class="modal-btn" onclick="joinViaCode()">[ join ]</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="dmModal">
+    <div class="modal">
+        <div class="modal-title">$ dm --user</div>
+        <label class="modal-label">username to message:</label>
+        <input type="text" class="modal-input" id="dmUsernameInput" placeholder="their_username" maxlength="24" autocomplete="off">
+        <div class="modal-btns">
+            <button class="modal-btn secondary" onclick="closeModal('dmModal')">[ cancel ]</button>
+            <button class="modal-btn" onclick="openDM()">[ open chat ]</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  CRYPTO — PBKDF2-SHA256 via Web Crypto API
+//  Passwords are NEVER stored. Only: salt (hex) + hash (hex)
+// ══════════════════════════════════════════════════════
+
+const PBKDF2_ITERS = 310_000; // OWASP 2023 minimum for SHA-256
+const SALT_BYTES   = 16;
+
+function bufToHex(buf) {
+    return Array.from(new Uint8Array(buf))
+        .map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function generateSalt() {
+    return bufToHex(crypto.getRandomValues(new Uint8Array(SALT_BYTES)));
+}
+
+async function hashPassword(password, saltHex) {
+    const enc   = new TextEncoder();
+    const salt  = new Uint8Array(saltHex.match(/.{2}/g).map(b => parseInt(b,16)));
+    const key   = await crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveBits']);
+    const bits  = await crypto.subtle.deriveBits(
+        {name:'PBKDF2', hash:'SHA-256', salt, iterations:PBKDF2_ITERS}, key, 256
+    );
+    return bufToHex(bits);
+}
+
+async function verifyPassword(password, saltHex, storedHash) {
+    return (await hashPassword(password, saltHex)) === storedHash;
+}
+
+// ══════════════════════════════════════════════════════
+//  STORAGE KEYS
+// ══════════════════════════════════════════════════════
+
+const K_ACCOUNTS = 'toro_accounts'; // { username_lc -> { username, hash, salt, color } }
+const K_SESSION  = 'toro_session';  // { username }
+const K_SERVERS  = 'toro_servers';
+const K_DMS      = 'toro_dms';
+
+const getAccounts = () => { try { return JSON.parse(localStorage.getItem(K_ACCOUNTS)||'{}'); } catch{ return {}; } };
+const saveAccounts= a => localStorage.setItem(K_ACCOUNTS, JSON.stringify(a));
+const getSession  = () => { try { return JSON.parse(localStorage.getItem(K_SESSION)||'null'); } catch{ return null; } };
+const saveSession = u => localStorage.setItem(K_SESSION, JSON.stringify({username:u}));
+const clearSession= () => localStorage.removeItem(K_SESSION);
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+
+let myUsername = '', myColor = '#60a5fa';
+let currentChannelId = null, currentChannelType = null;
+let pendingInvite = null;
+
+let servers = (() => { try{ return JSON.parse(localStorage.getItem(K_SERVERS)||'{}'); }catch{ return {}; } })();
+let dms     = (() => { try{ return JSON.parse(localStorage.getItem(K_DMS)||'{}'); }catch{ return {}; } })();
+
+const saveServers = () => localStorage.setItem(K_SERVERS, JSON.stringify(servers));
+const saveDMs     = () => localStorage.setItem(K_DMS, JSON.stringify(dms));
+
+// ══════════════════════════════════════════════════════
+//  AUTH UI
+// ══════════════════════════════════════════════════════
+
+function switchTab(tab) {
+    document.getElementById('tabLogin').style.display    = tab==='login'    ? 'block' : 'none';
+    document.getElementById('tabRegister').style.display = tab==='register' ? 'block' : 'none';
+    document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('active', (i===0)===(tab==='login')));
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('regError').textContent   = '';
+}
+
+function checkStrength(pw) {
+    let s = 0;
+    if (pw.length >= 6)  s++;
+    if (pw.length >= 10) s++;
+    if (/[A-Z]/.test(pw)) s++;
+    if (/[0-9]/.test(pw)) s++;
+    if (/[^A-Za-z0-9]/.test(pw)) s++;
+    const fill = document.getElementById('strengthFill');
+    fill.style.width      = (s/5*100)+'%';
+    fill.style.background = ['#f87171','#fb923c','#facc15','#4ade80','#4ade80'][Math.max(0,s-1)];
+}
+
+function setLoading(which, on) {
+    const isLogin = which==='login';
+    const btn  = document.getElementById(isLogin?'loginBtn':'regBtn');
+    const txt  = document.getElementById(isLogin?'loginBtnText':'regBtnText');
+    const spin = document.getElementById(isLogin?'loginSpinner':'regSpinner');
+    btn.disabled       = on;
+    spin.style.display = on ? 'block' : 'none';
+    txt.textContent    = on
+        ? (isLogin ? 'verifying...' : 'hashing...')
+        : (isLogin ? '[ connect ]' : '[ create account ]');
+}
+
+// ══════════════════════════════════════════════════════
+//  REGISTER
+// ══════════════════════════════════════════════════════
+
+async function doRegister() {
+    const username = document.getElementById('regUsername').value.trim();
+    const pw       = document.getElementById('regPassword').value;
+    const pw2      = document.getElementById('regPassword2').value;
+    const color    = document.getElementById('regColor').value;
+    const err      = document.getElementById('regError');
+    err.textContent = '';
+
+    if (!username)                            { err.textContent='error: username required'; return; }
+    if (!/^[a-zA-Z0-9_\-]+$/.test(username)) { err.textContent='error: letters, numbers, _ and - only'; return; }
+    if (pw.length < 6)                        { err.textContent='error: password must be at least 6 characters'; return; }
+    if (pw !== pw2)                           { err.textContent='error: passwords do not match'; return; }
+
+    const accounts = getAccounts();
+    if (accounts[username.toLowerCase()])     { err.textContent='error: username already taken'; return; }
+
+    setLoading('reg', true);
+    try {
+        const salt = generateSalt();
+        const hash = await hashPassword(pw, salt);
+        accounts[username.toLowerCase()] = { username, hash, salt, color, createdAt: Date.now() };
+        saveAccounts(accounts);
+        finishLogin(username, color);
+    } catch(e) {
+        err.textContent = 'error: ' + e.message;
+        setLoading('reg', false);
+    }
+}
+
+// ══════════════════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════════════════
+
+async function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const pw       = document.getElementById('loginPassword').value;
+    const err      = document.getElementById('loginError');
+    err.textContent = '';
+
+    if (!username || !pw) { err.textContent='error: fill in all fields'; return; }
+
+    const accounts = getAccounts();
+    const account  = accounts[username.toLowerCase()];
+    if (!account) { err.textContent='error: account not found'; return; }
+
+    setLoading('login', true);
+    try {
+        const valid = await verifyPassword(pw, account.salt, account.hash);
+        if (!valid) { err.textContent='error: wrong password'; setLoading('login',false); return; }
+        finishLogin(account.username, account.color);
+    } catch(e) {
+        err.textContent='error: '+e.message;
+        setLoading('login',false);
+    }
+}
+
+function finishLogin(username, color) {
+    myUsername = username; myColor = color;
+    saveSession(username);
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('logoutBtn').style.display  = 'inline-block';
+    document.getElementById('sidebarUsername').textContent = myUsername;
+    if (Object.keys(servers).length === 0) _createServer('general','the main hangout spot');
+    checkURLInvite();
+    renderServerList();
+    renderDMList();
+}
+
+function doLogout() { clearSession(); location.reload(); }
+
+// ══════════════════════════════════════════════════════
+//  SESSION RESTORE
+// ══════════════════════════════════════════════════════
+
+(function tryRestore() {
+    const sess = getSession();
+    if (!sess) return;
+    const acc = getAccounts()[sess.username.toLowerCase()];
+    if (!acc) { clearSession(); return; }
+    finishLogin(acc.username, acc.color);
+})();
+
+// ══════════════════════════════════════════════════════
+//  INVITES
+// ══════════════════════════════════════════════════════
+
+function checkURLInvite() {
+    const code = new URLSearchParams(window.location.search).get('invite');
+    if (code) handleIncomingInvite(code);
+}
+
+function handleIncomingInvite(code) {
+    const srv = Object.values(servers).find(s => s.inviteCode === code);
+    if (!srv) return;
+    document.getElementById('joinServerName').textContent = '"'+srv.name+'"';
+    pendingInvite = code;
+    document.getElementById('joinBanner').classList.add('show');
+}
+
+function acceptInvite() {
+    if (!pendingInvite) return;
+    const srv = Object.values(servers).find(s => s.inviteCode === pendingInvite);
+    if (srv) { openChannel(srv.id,'server'); addSystemMsg(srv.id,`${myUsername} joined via invite`); }
+    dismissInvite();
+    window.history.replaceState({},'', window.location.pathname);
+}
+function dismissInvite() { document.getElementById('joinBanner').classList.remove('show'); pendingInvite=null; }
+
+// ══════════════════════════════════════════════════════
+//  SERVERS
+// ══════════════════════════════════════════════════════
+
+function _createServer(name, desc) {
+    const id = 'srv_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    const inviteCode = Math.random().toString(36).slice(2,10);
+    servers[id] = { id, name, desc:desc||'', messages:[], inviteCode, ownerId:myUsername };
+    addSystemMsg(id, `server "${name}" created by ${myUsername}`);
+    saveServers(); renderServerList();
+    return id;
+}
+
+function createServer() {
+    const name = document.getElementById('newServerName').value.trim()||'unnamed';
+    const desc = document.getElementById('newServerDesc').value.trim();
+    const id   = _createServer(name, desc);
+    closeModal('createServerModal');
+    document.getElementById('newServerName').value='';
+    document.getElementById('newServerDesc').value='';
+    openChannel(id,'server');
+}
+
+function renderServerList() {
+    const list = document.getElementById('serverList');
+    list.innerHTML='';
+    Object.values(servers).forEach(srv => {
+        const el = document.createElement('div');
+        el.className='server-item'+(currentChannelId===srv.id?' active':'');
+        el.innerHTML=`<span class="server-icon">#</span><span class="server-name">${escHtml(srv.name)}</span>`;
+        el.onclick=()=>openChannel(srv.id,'server');
+        list.appendChild(el);
+    });
+}
+
+function renderDMList() {
+    const list=document.getElementById('dmList');
+    list.innerHTML='';
+    Object.values(dms).forEach(dm=>{
+        const other=dm.users.find(u=>u!==myUsername)||dm.users[0];
+        const el=document.createElement('div');
+        el.className='server-item'+(currentChannelId===dm.key?' active':'');
+        el.innerHTML=`<span class="server-icon">@</span><span class="server-name">${escHtml(other)}</span>`;
+        el.onclick=()=>openChannel(dm.key,'dm');
+        list.appendChild(el);
+    });
+}
+
+// ══════════════════════════════════════════════════════
+//  CHANNEL OPEN
+// ══════════════════════════════════════════════════════
+
+function openChannel(id, type) {
+    currentChannelId=id; currentChannelType=type;
+    document.getElementById('emptyState').style.display='none';
+    const ac=document.getElementById('activeChat');
+    ac.style.display='flex'; ac.style.flexDirection='column';
+    renderServerList(); renderDMList();
+    if (type==='server') {
+        const srv=servers[id];
+        document.getElementById('chatHeaderName').textContent=srv.name;
+        document.getElementById('chatHeaderMeta').textContent=srv.desc||'';
+        document.getElementById('inviteBtn').style.display='inline-block';
+    } else {
+        const dm=dms[id];
+        const other=dm.users.find(u=>u!==myUsername)||dm.users[0];
+        document.getElementById('chatHeaderName').textContent='@ '+other;
+        document.getElementById('chatHeaderMeta').textContent='direct message';
+        document.getElementById('inviteBtn').style.display='none';
+    }
+    renderMessages();
+    document.getElementById('msgInput').focus();
+}
+
+// ══════════════════════════════════════════════════════
+//  MESSAGES
+// ══════════════════════════════════════════════════════
+
+function addSystemMsg(cid, text) {
+    const store = servers[cid]?.messages || dms[cid]?.messages;
+    if (!store) return;
+    store.push({type:'system',text,time:nowTime()});
+    if (servers[cid]) saveServers(); else saveDMs();
+}
+
+function renderMessages() {
+    const el=document.getElementById('messages');
+    const store=currentChannelType==='server'
+        ? servers[currentChannelId]?.messages
+        : dms[currentChannelId]?.messages;
+    if (!store){el.innerHTML='';return;}
+    el.innerHTML='';
+    store.forEach(msg=>{
+        const div=document.createElement('div');
+        div.className='msg';
+        if (msg.type==='system') {
+            div.innerHTML=`<div class="msg-line">
+                <span class="msg-time">${msg.time}</span>
+                <span class="msg-author system-author">system</span>
+                <span class="msg-text system-text">${escHtml(msg.text)}</span></div>`;
+        } else {
+            const self=msg.author===myUsername;
+            div.innerHTML=`<div class="msg-line">
+                <span class="msg-time">${msg.time}</span>
+                <span class="msg-author${self?' self':''}" style="color:${escHtml(msg.color)}">${escHtml(msg.author)}</span>
+                <span class="msg-text">${escHtml(msg.text)}</span></div>`;
+        }
+        el.appendChild(div);
+    });
+    el.scrollTop=el.scrollHeight;
+}
+
+function sendMessage() {
+    const input=document.getElementById('msgInput');
+    const text=input.value.trim();
+    if (!text||!currentChannelId) return;
+    const store=currentChannelType==='server'
+        ? servers[currentChannelId]?.messages
+        : dms[currentChannelId]?.messages;
+    if (!store) return;
+    store.push({type:'msg',author:myUsername,color:myColor,text,time:nowTime()});
+    input.value='';
+    if (currentChannelType==='server') saveServers(); else saveDMs();
+    renderMessages();
+}
+
+document.getElementById('msgInput').addEventListener('keydown',e=>{
+    if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+});
+
+// ══════════════════════════════════════════════════════
+//  INVITE MODAL
+// ══════════════════════════════════════════════════════
+
+function openInviteModal() {
+    if (currentChannelType!=='server') return;
+    const srv=servers[currentChannelId];
+    const link=`${location.origin}${location.pathname}?invite=${srv.inviteCode}`;
+    document.getElementById('inviteServerNameDisplay').textContent=srv.name;
+    document.getElementById('inviteLinkText').textContent=link;
+    document.getElementById('copyConfirm').style.display='none';
+    document.getElementById('inviteModal').classList.add('open');
+}
+
+function copyInvite() {
+    const text=document.getElementById('inviteLinkText').textContent;
+    const show=()=>{document.getElementById('copyConfirm').style.display='block';};
+    navigator.clipboard.writeText(text).then(show).catch(()=>{
+        const ta=document.createElement('textarea');
+        ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');
+        document.body.removeChild(ta);show();
+    });
+}
+
+function openJoinModal() {
+    document.getElementById('joinModal').classList.add('open');
+    document.getElementById('joinError').style.display='none';
+    document.getElementById('joinCodeInput').value='';
+}
+
+function joinViaCode() {
+    const val=document.getElementById('joinCodeInput').value.trim();
+    let code=val;
+    try{const u=new URL(val);code=u.searchParams.get('invite')||val;}catch{}
+    const srv=Object.values(servers).find(s=>s.inviteCode===code);
+    if (!srv){document.getElementById('joinError').style.display='block';return;}
+    closeModal('joinModal');
+    openChannel(srv.id,'server');
+    addSystemMsg(srv.id,`${myUsername} joined via invite`);
+    renderMessages();
+}
+
+function openDMModal(){document.getElementById('dmModal').classList.add('open');document.getElementById('dmUsernameInput').value='';}
+
+function openDM(){
+    const other=document.getElementById('dmUsernameInput').value.trim();
+    if(!other)return;
+    const key=[myUsername,other].sort().join('::');
+    if(!dms[key]){dms[key]={key,users:[myUsername,other],messages:[]};addSystemMsg(key,`dm started`);saveDMs();}
+    closeModal('dmModal');renderDMList();openChannel(key,'dm');
+}
+
+function openCreateServer(){document.getElementById('createServerModal').classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+
+document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('regPassword2').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+
+function nowTime(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+</script>
+</body>
+</html>
