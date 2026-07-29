@@ -58,7 +58,8 @@
     align-items: center;
     justify-content: center;
   }
-  .gallery-frame img {
+  .gallery-frame img,
+  .gallery-frame video {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -67,6 +68,16 @@
   .gallery-item .pictochat-status {
     text-align: center;
     width: 100%;
+  }
+
+  .embed-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .embed-wrap iframe {
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
   }
 
   .note-text {
@@ -101,30 +112,65 @@
   <div class="gallery-grid">
     <div class="gallery-item">
       <div class="gallery-frame">
-        <img src="https://torodem.neocities.org/homer.png" alt="homer" loading="lazy">
+        <img src="./bluesypegordon.jpg" alt="bluesypegordon" loading="lazy">
       </div>
-      <div class="pictochat-status">homer</div>
+      <div class="pictochat-status">bluesypegordon</div>
     </div>
 
     <div class="gallery-item">
       <div class="gallery-frame">
-        <img src="https://torodem.neocities.org/scb3.avif" alt="scb3" loading="lazy">
+        <img src="./eli.png" alt="eli" loading="lazy">
       </div>
-      <div class="pictochat-status">scb3</div>
+      <div class="pictochat-status">eli</div>
     </div>
 
     <div class="gallery-item">
       <div class="gallery-frame">
-        <img src="https://torodem.neocities.org/scb2.avif" alt="scb2" loading="lazy">
+        <img src="./fc.png" alt="fc" loading="lazy">
       </div>
-      <div class="pictochat-status">scb2</div>
+      <div class="pictochat-status">fc</div>
     </div>
 
     <div class="gallery-item">
       <div class="gallery-frame">
-        <img src="https://torodem.neocities.org/scb1.avif" alt="scb1" loading="lazy">
+        <img src="./fv.png" alt="fv" loading="lazy">
       </div>
-      <div class="pictochat-status">scb1</div>
+      <div class="pictochat-status">fv</div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-frame">
+        <img src="./myf.png" alt="myf" loading="lazy">
+      </div>
+      <div class="pictochat-status">myf</div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-frame">
+        <img src="./nathanred.png" alt="nathanred" loading="lazy">
+      </div>
+      <div class="pictochat-status">nathanred</div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-frame">
+        <img src="./ocean.png" alt="ocean" loading="lazy">
+      </div>
+      <div class="pictochat-status">ocean</div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-frame">
+        <img src="./water.png" alt="water" loading="lazy">
+      </div>
+      <div class="pictochat-status">water</div>
+    </div>
+
+    <div class="gallery-item">
+      <div class="gallery-frame">
+        <img src="./yep.png" alt="yep" loading="lazy">
+      </div>
+      <div class="pictochat-status">yep</div>
     </div>
   </div>
 
@@ -132,6 +178,22 @@
 </section>
 
 <div class="bar-lg-reverse bg-ds-theme-teal" style="margin-top: 32px;"></div>
+
+<!-- ===================== MUSIC ===================== -->
+<section>
+  <div class="pictochat-window">
+    <div class="pictochat-message">now playing</div>
+    <div class="pictochat-status">tremolo — torodem</div>
+  </div>
+
+  <div class="embed-wrap">
+    <iframe style="width: 350px; height: 470px;" src="https://bandcamp.com/EmbeddedPlayer/track=375848514/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/" seamless>
+      <a href="https://torodem.bandcamp.com/track/tremolo">Tremolo by Torodem</a>
+    </iframe>
+  </div>
+</section>
+
+<div class="bar-lg bg-ds-theme-turquoise" style="margin-top: 32px;"></div>
 
 </body>
 </html>
