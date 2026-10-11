@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>torodem — server</title>
+    <link rel="stylesheet" href="https://unpkg.com/@spiritov/ds.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="ds-grid page">
+        <div class="bar ds-green titlebar">torodem ●●●</div>
+
+        <main>
+            <nav>
+                <a href="/"><button>home</button></a>
+                <a href="/gallery"><button>gallery</button></a>
+                <a href="/server"><button class="ds-green">server</button></a>
+                <a href="/contact"><button>contact</button></a>
+                <button class="button-lg" disabled>chat (under construction)</button>
+            </nav>
+
+            <div class="alert">
+                <p>♪ new track out now: synchronised by torodem</p>
+                <a href="https://torodem.bandcamp.com/track/synchronised" target="_blank" rel="noopener"><button>listen</button></a>
+            </div>
+
+            <div>
+                <h1>server</h1>
+                <p class="sub">uct community minecraft server · est. aug 2026</p>
+            </div>
+
+            <div class="pictochat-window">
+                <div class="pictochat-status pictochat-enter-highlight">now joining.. uct community minecraft server</div>
+
+                <div class="pictochat-message">
+                    <header class="ds-turquoise-50">🎮 bedrock</header>
+                    <label>
+                        <span>address</span>
+                        <input type="text" readonly value="fried-borrowing.tun.ply.gg" onclick="this.select()">
+                    </label>
+                    <label>
+                        <span>port</span>
+                        <input type="text" readonly value="13724" onclick="this.select()">
+                    </label>
+                    <label>
+                        <span>or by ip</span>
+                        <input type="text" readonly value="147.185.221.216" onclick="this.select()">
+                    </label>
+                    <p>same port (13724) for the ip.</p>
+                </div>
+
+                <div class="pictochat-message">
+                    <header class="ds-orange-50">💻 java</header>
+                    <label>
+                        <span>address</span>
+                        <input type="text" readonly value="fried-elaine.tun.ply.gg" onclick="this.select()">
+                    </label>
+                </div>
+
+                <div class="pictochat-status pictochat-exit-highlight">now leaving.. see you in game</div>
+            </div>
+
+            <div class="alert">
+                <div class="loading-container">
+                    <div class="loading-1"></div>
+                    <div class="loading-2"></div>
+                    <div class="loading-3"></div>
+                    <div class="loading-4"></div>
+                    <div class="loading-center"></div>
+                    <div class="loading-6"></div>
+                    <div class="loading-7"></div>
+                    <div class="loading-8"></div>
+                    <div class="loading-9"></div>
+                </div>
+                <p>server is on 26.3, but geyser only has 26.2. bedrock uses 26.2 until geyser updates.</p>
+            </div>
+
+            <div>
+                <details>
+                    <summary class="ds-slate">pc</summary>
+                    <p>add the server as a custom server using the address and port above. use the bedrock address for bedrock, the java address for java.</p>
+                </details>
+
+                <details>
+                    <summary class="ds-slate">console (switch, xbox, playstation)</summary>
+                    <p>
+                        consoles can't add custom servers, so you need an app on your phone:
+                        <br>android: <a href="https://play.google.com/store/apps/details?id=com.smokiem.mcserverconnector&hl=en_US" target="_blank" rel="noopener">MC Server Connector</a>
+                        <br>ios: <a href="https://apps.apple.com/us/app/bedrocktogether/id1534593376" target="_blank" rel="noopener">BedrockTogether</a>
+                    </p>
+                </details>
+            </div>
+
+            <a href="https://discord.gg/Gaxw6Fc2XB" target="_blank" rel="noopener"><button class="button-lg">💬 join the discord</button></a>
+
+            <footer>
+                <p>made using <a href="https://github.com/spiritov/ds.css" target="_blank" rel="noopener">ds.css</a> from spiritov</p>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>

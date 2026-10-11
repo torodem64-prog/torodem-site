@@ -1,313 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>torodem</title>
-
-<link rel="icon" type="image/svg+xml" href="./assets/svg/favicon.svg">
-
-<!-- ds.css — DS Lite UI framework: https://github.com/spiritov/ds.css
-     Local compiled build, using the framework's real assets/font. -->
-<link rel="stylesheet" href="./assets/css/ds.css">
-
-<style>
-  body {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 24px 16px 64px;
-  }
-  header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  header h1 {
-    font-size: 2em;
-    margin-bottom: 12px;
-  }
-  nav {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  section {
-    margin-top: 28px;
-  }
-  .info-text a {
-    color: inherit;
-    text-decoration: underline;
-  }
-  .embed-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 12px;
-  }
-  .embed-row iframe {
-    border: 0;
-    max-width: 100%;
-  }
-  .section-label {
-    margin-bottom: 8px;
-    display: inline-block;
-  }
-
-  /* ===== DS-style top screen clock widget ===== */
-  .ds-topscreen {
-    max-width: 260px;
-    margin: 0 auto;
-    border: 2px solid #000;
-    background: #fff;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
-  }
-  .ds-topscreen .ds-statusbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2px 6px;
-    font-size: 0.7em;
-    color: #fff;
-    letter-spacing: 1px;
-  }
-  .ds-topscreen .ds-clock {
-    text-align: center;
-    padding: 14px 0 6px;
-    font-size: 1.8em;
-    letter-spacing: 2px;
-  }
-  .ds-topscreen .ds-clock .blink {
-    animation: ds-blink 1s infinite;
-  }
-  @keyframes ds-blink {
-    50% { opacity: 0; }
-  }
-  .ds-topscreen .ds-date {
-    text-align: center;
-    font-size: 0.75em;
-    padding-bottom: 12px;
-    letter-spacing: 1px;
-  }
-
-  /* ===== DS-style calendar grid ===== */
-  .ds-calendar {
-    max-width: 260px;
-    margin: 14px auto 0;
-    border: 2px solid #000;
-    background: #fff;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
-  }
-  .ds-calendar .ds-cal-header {
-    text-align: center;
-    font-size: 0.85em;
-    letter-spacing: 2px;
-    padding: 4px 0;
-    color: #fff;
-  }
-  .ds-cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background: #000;
-    border-top: 1px solid #000;
-  }
-  .ds-cal-grid > div {
-    background: #fff;
-    text-align: center;
-    font-size: 0.7em;
-    padding: 4px 0;
-  }
-  .ds-cal-grid .ds-cal-dow {
-    color: #fff;
-    font-weight: bold;
-  }
-  .ds-cal-grid .ds-cal-empty {
-    background: #f0f0f0;
-  }
-  .ds-cal-grid .ds-cal-today {
-    color: #fff;
-    font-weight: bold;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>torodem</title>
+    <link rel="stylesheet" href="https://unpkg.com/@spiritov/ds.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="https://unpkg.com/@spiritov/ds.css/dist/widgets/ds-clock.js"></script>
+    <script type="module" src="https://unpkg.com/@spiritov/ds.css/dist/widgets/ds-calendar.js"></script>
 </head>
-<body class="ds">
+<body>
+    <div class="ds-grid page">
+        <div class="bar ds-blue titlebar">torodem ●●●</div>
 
-<header>
-  <h1>torodem</h1>
-  <nav>
-    <button class="bg-ds-theme-blue" onclick="location.href='https://torodem.com/index.html'">home</button>
-    <button class="bg-ds-theme-turquoise" onclick="location.href='https://torodem.com/gallery.html'">gallery</button>
-    <button class="bg-ds-theme-lime" onclick="location.href='https://torodem.com/contact.html'">contact</button>
-    <button class="bg-ds-theme-orange" onclick="location.href='https://under construction sorry'">chat(under construction)</button>
-  </nav>
-</header>
+        <main>
+            <nav>
+                <a href="/"><button class="ds-blue">home</button></a>
+                <a href="/gallery"><button>gallery</button></a>
+                <a href="/server"><button>server</button></a>
+                <a href="/contact"><button>contact</button></a>
+                <button class="button-lg" disabled>chat (under construction)</button>
+            </nav>
 
-<div class="bar-lg bg-ds-theme-blue"></div>
+            <div class="alert">
+                <p>♪ new track out now: synchronised by torodem</p>
+                <a href="https://torodem.bandcamp.com/track/synchronised" target="_blank" rel="noopener"><button>listen</button></a>
+            </div>
 
-<!-- ===================== INTRO / PICTOCHAT GREETING ===================== -->
-<section>
-  <div class="pictochat-window">
-    <div class="pictochat-message">hi person</div>
-    <div class="pictochat-status">welcome to torodem.com</div>
-    <div class="pictochat-status">My name is Demetrios and I made all of this.</div>
-  </div>
-</section>
+            <div>
+                <h1>hi person</h1>
+                <p class="sub">welcome to torodem.com</p>
+            </div>
 
-<div class="bar bg-ds-theme-navy"></div>
+            <div class="pictochat-window">
+                <div class="pictochat-status pictochat-enter-highlight">now joining.. torodem.com</div>
 
-<!-- ===================== DS-STYLE CLOCK / CALENDAR ===================== -->
-<section>
-  <div class="ds-topscreen">
-    <div class="ds-statusbar bg-ds-theme-slate">
-      <span>torodem</span>
-      <span>&#9679;&#9679;&#9679;</span>
+                <div class="pictochat-message">
+                    <header class="ds-slate-50">hello</header>
+                    <p>My name is Demetrios and I made all of this.</p>
+                </div>
+
+                <div class="pictochat-message">
+                    <header class="ds-turquoise-50">🎧 bandcamp</header>
+                    <p>Listen to releases straight from Bandcamp, or head over to <a href="https://torodem.bandcamp.com" target="_blank" rel="noopener">torodem.bandcamp.com</a> for the full catalog.</p>
+                    <iframe style="height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/v=2/track=338934521/size=large/tracklist=false/artwork=small/transparent=true/" seamless></iframe>
+                    <iframe style="height: 42px;" src="https://bandcamp.com/EmbeddedPlayer/v=2/track=375848514/size=small/tracklist=false/artwork=small/transparent=true/" seamless></iframe>
+                </div>
+
+                <div class="pictochat-message">
+                    <header class="ds-red-50">▶ youtube</header>
+                    <p>Videos, visuals, and whatever else lands on the main channel. Full archive at <a href="https://www.youtube.com/@torodem" target="_blank" rel="noopener">youtube.com/@torodem</a>.</p>
+                </div>
+
+                <div class="pictochat-message">
+                    <header class="ds-orange-50">▶ youtube</header>
+                    <p>The aphexlarp channel. Full archive at <a href="https://www.youtube.com/@aphexlarp" target="_blank" rel="noopener">youtube.com/@aphexlarp</a>.</p>
+                </div>
+            </div>
+
+            <div class="widgets">
+                <ds-clock></ds-clock>
+                <ds-calendar></ds-calendar>
+            </div>
+
+            <a class="badge" href="/"><img src="torodembadge.png" alt="Torodem"></a>
+
+            <footer>
+                <p>made using <a href="https://github.com/spiritov/ds.css" target="_blank" rel="noopener">ds.css</a> from spiritov</p>
+            </footer>
+        </main>
     </div>
-    <div class="ds-clock" id="ds-clock">--<span class="blink">:</span>--</div>
-    <div class="ds-date" id="ds-date">-- --- ----</div>
-  </div>
-
-  <div class="ds-calendar">
-    <div class="ds-cal-header bg-ds-theme-navy" id="ds-cal-month">-- ----</div>
-    <div class="ds-cal-grid" id="ds-cal-grid">
-      <!-- populated by JS below -->
-    </div>
-  </div>
-</section>
-
-<script>
-(function () {
-  var clockEl = document.getElementById('ds-clock');
-  var dateEl = document.getElementById('ds-date');
-  var monthEl = document.getElementById('ds-cal-month');
-  var gridEl = document.getElementById('ds-cal-grid');
-  var dows = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-  var months = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-
-  function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-  function renderClock() {
-    var now = new Date();
-    var h = pad(now.getHours());
-    var m = pad(now.getMinutes());
-    clockEl.innerHTML = h + '<span class="blink">:</span>' + m;
-    dateEl.textContent = dows[now.getDay()] + ' ' + now.getDate() + ' '
-      + months[now.getMonth()].slice(0, 3) + ' ' + now.getFullYear();
-  }
-
-  function renderCalendar() {
-    var now = new Date();
-    var year = now.getFullYear();
-    var month = now.getMonth();
-    var today = now.getDate();
-    monthEl.textContent = months[month] + ' ' + year;
-
-    var firstDay = new Date(year, month, 1).getDay();
-    var daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    var html = '';
-    dows.forEach(function (d) {
-      html += '<div class="ds-cal-dow bg-ds-theme-navy">' + d + '</div>';
-    });
-    for (var i = 0; i < firstDay; i++) {
-      html += '<div class="ds-cal-empty"></div>';
-    }
-    for (var day = 1; day <= daysInMonth; day++) {
-      if (day === today) {
-        html += '<div class="ds-cal-today bg-ds-theme-orange">' + day + '</div>';
-      } else {
-        html += '<div>' + day + '</div>';
-      }
-    }
-    gridEl.innerHTML = html;
-  }
-
-  renderClock();
-  renderCalendar();
-  setInterval(renderClock, 1000 * 30);
-})();
-</script>
-
-<div class="bar bg-ds-theme-fuschia"></div>
-
-<a href="https://torodem.com" target="_blank" rel="noopener">
-  <img src="torodembadge.png" width="88" height="31" alt="Torodem" title="Torodem" style="image-rendering:pixelated;">
-</a>
-     
-<!-- ===================== BANDCAMP ===================== -->
-<section>
-  <div class="info">
-    <div class="info-square">🎧</div>
-    <div class="info-container">
-      <div class="info-label">torodem.bandcamp.com</div>
-      <div class="info-text">
-        Listen to releases straight from Bandcamp, or head over to
-        <a href="https://torodem.bandcamp.com" target="_blank" rel="noopener">torodem.bandcamp.com</a>
-        for the full catalog.
-      </div>
-    </div>
-  </div>
-
-  <!--
-    Live embed of "Tremolo" (track id 375848514). To feature a different
-    release: on Bandcamp go to the album/track page -> Share/Embed -> copy
-    the "large" embed code and swap the iframe src below.
-  -->
-  <div class="embed-row">
-    <iframe
-      style="width: 400px; height: 472px;"
-      src="https://bandcamp.com/EmbeddedPlayer/v=2/track=338934521/size=large/tracklist=false/artwork=small/transparent=true/"
-      seamless>
-      <a href="https://torodem.bandcamp.com/track/synchronised">synchronised, by Torodem</a>
-    </iframe>
-
-    <iframe
-      style="width: 400px; height: 472px;"
-      src="https://bandcamp.com/EmbeddedPlayer/v=2/track=375848514/size=small/tracklist=false/artwork=small/transparent=true/"
-      seamless>
-      <a href="https://torodem.bandcamp.com/track/tremolo">Tremolo, by Torodem</a>
-    </iframe>
-  </div>
-</section>
-
-<div class="bar bg-ds-theme-magenta"></div>
-
-<!-- ===================== YOUTUBE: @torodem ===================== -->
-<section>
-  <div class="info">
-    <div class="info-square">▶</div>
-    <div class="info-container">
-      <div class="info-label">youtube.com/@torodem</div>
-      <div class="info-text">
-        Videos, visuals, and whatever else lands on the main channel. Full
-        archive at <a href="https://www.youtube.com/@torodem" target="_blank" rel="noopener">youtube.com/@torodem</a>.
-      </div>
-    </div>
-</div>
-</section>
-
-<div class="bar bg-ds-theme-darkpurple"></div>
-
-<!-- ===================== YOUTUBE: @aphexlarp ===================== -->
-<section>
-  <div class="info">
-    <div class="info-square">▶</div>
-    <div class="info-container">
-      <div class="info-label">youtube.com/@aphexlarp</div>
-      <div class="info-text">
-        The aphexlarp channel. Full archive at
-        <a href="https://www.youtube.com/@aphexlarp" target="_blank" rel="noopener">youtube.com/@aphexlarp</a>.
-      </div>
-    </div>
-  </div>
-
-  <!-- Same deal: swap VIDEO_ID_HERE for a real video/playlist ID -->
-</section>
-
-<div class="bar-lg-reverse bg-ds-theme-teal" style="margin-top: 32px;">
-<label> made using ds.css from spiritov</label>
-</div>
-
 </body>
 </html>

@@ -1,102 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>torodem — contact</title>
-
-<link rel="icon" type="image/svg+xml" href="./assets/svg/favicon.svg">
-
-<!-- ds.css — DS Lite UI framework: https://github.com/spiritov/ds.css -->
-<link rel="stylesheet" href="./assets/css/ds.css">
-
-<style>
-  body {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 24px 16px 64px;
-  }
-  header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  header h1 {
-    font-size: 2em;
-    margin-bottom: 12px;
-  }
-  nav {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  section {
-    margin-top: 28px;
-  }
-  .info-text a {
-    color: inherit;
-    text-decoration: underline;
-  }
-  .stack {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>torodem — contact</title>
+    <link rel="stylesheet" href="https://unpkg.com/@spiritov/ds.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
-<body class="ds">
+<body>
+    <div class="ds-grid page">
+        <div class="bar ds-orange titlebar">torodem ●●●</div>
 
-<header>
-  <h1>contact</h1>
-  <nav>
-    <button class="bg-ds-theme-blue" onclick="location.href='https://torodem.com/index.html'">home</button>
-    <button class="bg-ds-theme-turquoise" onclick="location.href='https://torodem.com/gallery.html'">gallery</button>
-    <button class="bg-ds-theme-lime" onclick="location.href='https://torodem.com/contact.html'">contact</button>
-    <button class="bg-ds-theme-orange" onclick="location.href='https://under construction sorry'">chat (under construction)</button>
-  </nav>
-</header>
+        <main>
+            <nav>
+                <a href="/"><button>home</button></a>
+                <a href="/gallery"><button>gallery</button></a>
+                <a href="/server"><button>server</button></a>
+                <a href="/contact"><button class="ds-orange">contact</button></a>
+                <button class="button-lg" disabled>chat (under construction)</button>
+            </nav>
 
-<div class="bar-lg bg-ds-theme-lime"></div>
+            <div class="alert">
+                <p>♪ new track out now: synchronised by torodem</p>
+                <a href="https://torodem.bandcamp.com/track/synchronised" target="_blank" rel="noopener"><button>listen</button></a>
+            </div>
 
-<!-- ===================== CONTACT INFO ===================== -->
-<section class="stack">
-  <div class="info">
-    <div class="info-square">&#9993;</div>
-    <div class="info-container">
-      <div class="info-label">email</div>
-      <div class="info-text">
-        <a href="mailto:toro@torodem.com">toro (at) torodem.com</a> —
-        reach out for collaborations or questions. Response time: 24-48 hours.
-      </div>
+            <div>
+                <h1>contact</h1>
+            </div>
+
+            <div class="pictochat-window">
+                <div class="pictochat-status pictochat-enter-highlight">now joining.. contact</div>
+
+                <div class="pictochat-message">
+                    <header class="ds-turquoise-50">✉ email</header>
+                    <p><a href="mailto:toro@torodem.com">toro (at) torodem.com</a></p>
+                    <p>reach out for collaborations or questions. Response time: 24-48 hours.</p>
+                </div>
+
+                <div class="pictochat-message">
+                    <header class="ds-green-50">💻 github</header>
+                    <p><a href="https://github.com/torodem" target="_blank" rel="noopener">github.com/torodem</a></p>
+                </div>
+
+                <div class="pictochat-message">
+                    <header class="ds-orange-50">topics of interest</header>
+                    <p>🎮 gaming · 💻 coding · 🎵 music · 🎲 random other crap idk</p>
+                </div>
+
+                <div class="pictochat-status pictochat-exit-highlight">reply times may vary</div>
+            </div>
+
+            <footer>
+                <p>made using <a href="https://github.com/spiritov/ds.css" target="_blank" rel="noopener">ds.css</a> from spiritov</p>
+            </footer>
+        </main>
     </div>
-  </div>
-
-  <div class="info">
-    <div class="info-square">&#128187;</div>
-    <div class="info-container">
-      <div class="info-label">github</div>
-      <div class="info-text">
-        <a href="https://github.com/torodem" target="_blank" rel="noopener">github.com/torodem</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="bar bg-ds-theme-fuschia"></div>
-
-<!-- ===================== INTERESTS ===================== -->
-<section>
-  <div class="pictochat-window">
-    <div class="pictochat-message">
-      topics of interest:<br>
-      &#127918; gaming &nbsp;&middot;&nbsp; &#128187; coding &nbsp;&middot;&nbsp; &#127925; music &nbsp;&middot;&nbsp; &#127922; random other crap idk
-    </div>
-    <div class="pictochat-status">reply times may vary</div>
-  </div>
-</section>
-
-<div class="bar-lg-reverse bg-ds-theme-teal" style="margin-top: 32px;"></div>
-
 </body>
 </html>
